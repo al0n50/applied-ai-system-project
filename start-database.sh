@@ -15,9 +15,15 @@
 set -a
 source .env
 
-DB_PASSWORD=$(echo "$DATABASE_URL" | awk -F':' '{print $3}' | awk -F'@' '{print $1}')
-DB_PORT=$(echo "$DATABASE_URL" | awk -F':' '{print $4}' | awk -F'\/' '{print $1}')
-DB_NAME=$(echo "$DATABASE_URL" | awk -F'/' '{print $4}')
+# Extract password
+DB_PASSWORD=$(echo "$DATABASE_URL" | sed -E 's#.*://[^:]+:([^@]+)@.*#\1#')
+# Extract host
+DB_HOST=$(echo "$DATABASE_URL" | sed -E 's#.*@([^:/]+):.*#\1#')
+# Extract port
+DB_PORT=$(echo "$DATABASE_URL" | sed -E 's#.*:([0-9]+)/.*#\1#')
+# Extract database name
+DB_NAME=$(echo "$DATABASE_URL" | sed -E 's#.*/([^/?]+)$#\1#')
+
 DB_CONTAINER_NAME="$DB_NAME-postgres"
 
 if ! [ -x "$(command -v docker)" ] && ! [ -x "$(command -v podman)" ]; then
