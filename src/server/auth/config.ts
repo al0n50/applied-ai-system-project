@@ -1,5 +1,6 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 import { db } from "~/server/db";
 import {
@@ -36,7 +37,27 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 export const authConfig = {
+  session: {
+    strategy: "database",
+  },
   providers: [
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (credentials?.email == null || credentials?.password == null)
+          return null;
+        try {
+          // TODO: authorize logic here
+        } catch (error) {
+          throw new Error("Error", { cause: error });
+        }
+        return null;
+      },
+    }),
     /**
      * ...add auth providers here.
      *
