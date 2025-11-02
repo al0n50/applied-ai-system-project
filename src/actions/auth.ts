@@ -1,5 +1,4 @@
 "use server";
-// TODO: Change dashboard redirect
 import { signIn } from "~/server/auth";
 import { signup } from "~/server/auth/credentials";
 import { z } from "zod/v4";
@@ -40,7 +39,7 @@ export const registerUser = async (prevState: unknown, formData: FormData) => {
     return { message: "Sign-in failed. Please try again." };
   }
 
-  redirect("/dashboard");
+  redirect("/");
 };
 
 export const signin = async (prevState: unknown, formData: FormData) => {
@@ -65,5 +64,5 @@ export const signin = async (prevState: unknown, formData: FormData) => {
     return { message: "Sign-in failed. Please try again." };
   }
 
-  redirect("/dashboard");
+  redirect("/");
 };
