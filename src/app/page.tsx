@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SignoutButton } from "~/components/SignoutButton";
 
 export default function HomePage() {
   return (
@@ -30,6 +31,7 @@ export default function HomePage() {
               deploy it.
             </div>
           </Link>
+          <SignoutButton />
         </div>
       </div>
     </main>

@@ -1,5 +1,5 @@
 "use server";
-import { signIn } from "~/server/auth";
+import { signIn, signOut } from "~/server/auth";
 import { signup } from "~/server/auth/credentials";
 import { z } from "zod/v4";
 import { redirect } from "next/navigation";
@@ -65,4 +65,8 @@ export const signin = async (prevState: unknown, formData: FormData) => {
   }
 
   redirect("/");
+};
+
+export const signout = async () => {
+  await signOut();
 };
