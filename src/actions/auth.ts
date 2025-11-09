@@ -6,7 +6,9 @@ import { redirect } from "next/navigation";
 
 const authSchema = z.object({
   email: z.email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string(),
+  type: z.enum(["customer", "business"]),
   name: z.string(),
 });
 
@@ -14,8 +16,14 @@ export const registerUser = async (prevState: unknown, formData: FormData) => {
   const data = authSchema.parse({
     email: formData.get("email"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirm-password"),
+    type: formData.get("type"),
     name: formData.get("name"),
   });
+
+  if (data.password !== data.confirmPassword) {
+    return { message: "Passwords do not match" };
+  }
 
   try {
     await signup({
@@ -25,7 +33,11 @@ export const registerUser = async (prevState: unknown, formData: FormData) => {
     });
   } catch (error) {
     console.error("Registration error:", error);
-    return { message: "Registration failed. Please try again." };
+    if (error instanceof Error) {
+      return { message: error.message };
+    } else {
+      return { message: "Registration failed. Please try again." };
+    }
   }
 
   try {
