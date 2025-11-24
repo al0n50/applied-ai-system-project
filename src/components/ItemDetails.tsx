@@ -1,0 +1,74 @@
+import { Button } from "./ui/button";
+import { Field, FieldGroup, FieldLabel, FieldSet } from "./ui/field";
+import { Input } from "./ui/input";
+import { Skeleton } from "./ui/skeleton";
+
+const fakeData = {
+  images: [],
+  title: "Fender Stratocaster Electric Guitar",
+  dayPrice: 25,
+  amountAvailable: 3,
+  businessName: "Music Central",
+  details: "",
+};
+
+export default function ItemDetails() {
+  const days = 3;
+  const totalPrice = fakeData.dayPrice * days;
+  return (
+    <main className="mx-auto max-w-7xl p-12">
+      <section className="gap-16 lg:flex">
+        <div className="space-y-4 pb-4">
+          <Skeleton className="h-[28rem] w-[28rem] rounded-lg bg-neutral-200" />
+          <div className="flex gap-4">
+            <Skeleton className="h-[6rem] w-[6rem] rounded-lg bg-neutral-200" />
+            <Skeleton className="h-[6rem] w-[6rem] rounded-lg bg-neutral-200" />
+            <Skeleton className="h-[6rem] w-[6rem] rounded-lg bg-neutral-200" />
+          </div>
+        </div>
+
+        <form action="" className="space-y-4">
+          <div className="flex items-end">
+            <h1 className="text-4xl font-bold">{fakeData.title}</h1>
+            <p className="rounded-full bg-green-500/20 px-2 whitespace-nowrap text-green-600/50">
+              {fakeData.amountAvailable} available
+            </p>
+          </div>
+          <p className="text-neutral-400">
+            Provided by {fakeData.businessName}
+          </p>
+
+          <Skeleton className="h-[24rem] rounded-lg bg-neutral-200" />
+
+          <div className="flex gap-8">
+            <Field>
+              <FieldLabel>Start Date</FieldLabel>
+              <Input name="start-date" required placeholder="11/23/2025" />
+            </Field>
+
+            <Field>
+              <FieldLabel>End Date</FieldLabel>
+              <Input name="end-date" required placeholder="11/24/2025" />
+            </Field>
+          </div>
+
+          <div className="flex justify-between rounded-md bg-blue-500/10 px-2 py-3">
+            <p>Total for {days}days</p>
+            <p>${totalPrice}</p>
+          </div>
+
+          <Field>
+            <Button type="submit" className="bg-blue-500">
+              Rent now
+            </Button>
+          </Field>
+        </form>
+      </section>
+
+      <section>
+        <h2>Details</h2>
+        {fakeData.details}
+      </section>
+    </main>
+  );
+}
