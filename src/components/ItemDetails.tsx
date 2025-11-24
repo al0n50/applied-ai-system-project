@@ -58,7 +58,7 @@ export default function ItemDetails() {
           </div>
 
           <Field>
-            <Button type="submit" className="bg-blue-500">
+            <Button type="submit" variant="primary">
               Rent now
             </Button>
           </Field>

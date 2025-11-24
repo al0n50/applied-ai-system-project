@@ -37,7 +37,7 @@ export default function Navbar() {
         </Avatar>
       ) : (
         <>
-          <Button className="bg-blue-500">Login</Button>
+          <Button variant="primary">Login</Button>
           <Button variant="secondary">Sign Up</Button>
         </>
       )}
