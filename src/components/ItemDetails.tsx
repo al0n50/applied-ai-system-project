@@ -1,7 +1,11 @@
+"use client";
+import type { DateRange } from "react-day-picker";
 import { Button } from "./ui/button";
+import { Calendar } from "./ui/calendar";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "./ui/field";
 import { Input } from "./ui/input";
 import { Skeleton } from "./ui/skeleton";
+import { useState } from "react";
 
 const fakeData = {
   images: [],
@@ -13,6 +17,11 @@ const fakeData = {
 };
 
 export default function ItemDetails() {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(2025, 5, 12),
+    to: new Date(2025, 6, 15),
+  });
+
   const days = 3;
   const totalPrice = fakeData.dayPrice * days;
   return (
@@ -38,7 +47,15 @@ export default function ItemDetails() {
             Provided by {fakeData.businessName}
           </p>
 
-          <Skeleton className="h-[24rem] rounded-lg bg-neutral-200" />
+          {/* Calendar */}
+          <Calendar
+            mode="range"
+            defaultMonth={dateRange?.from}
+            selected={dateRange}
+            onSelect={setDateRange}
+            numberOfMonths={2}
+            className="w-full max-w-2xl self-center rounded-lg border shadow-sm"
+          />
 
           <div className="flex gap-8">
             <Field>

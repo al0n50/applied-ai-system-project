@@ -28,9 +28,17 @@ import {
   PaginationPrevious,
 } from "~/components/ui/pagination";
 import Link from "next/link";
+import type { DateRange } from "react-day-picker";
+import { Calendar } from "./ui/calendar";
 
 export default function RentalSearchPage() {
   const toggleState = useState<"grid" | "table">("grid");
+
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(2025, 5, 12),
+    to: new Date(2025, 6, 15),
+  });
+
   return (
     <main className="flex flex-col justify-center gap-8 p-8 lg:flex-row lg:items-start">
       <aside className="rounded-md bg-white p-4">
@@ -93,7 +101,15 @@ export default function RentalSearchPage() {
         </div>
 
         {/* Calendar */}
-        <Skeleton className="h-[24rem] rounded-lg bg-neutral-200" />
+        {/* <Skeleton className="h-[24rem] rounded-lg bg-neutral-200" /> */}
+        <Calendar
+          mode="range"
+          defaultMonth={dateRange?.from}
+          selected={dateRange}
+          onSelect={setDateRange}
+          numberOfMonths={2}
+          className="w-full max-w-7xl self-center rounded-lg border shadow-sm"
+        />
 
         {/* Search Results */}
         <div className="flex justify-between">
