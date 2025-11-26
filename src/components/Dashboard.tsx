@@ -4,15 +4,18 @@ import { SectionCards } from "~/components/section-cards";
 import data from "~/components/data.json";
 import { Button } from "~/components/ui/button";
 import { Plus } from "lucide-react";
+import Link from "next/link";
 
 export default function Dashboard() {
   return (
     <>
       <div className="flex justify-between p-8 pb-0">
-        <h1 className="text-4xl font-semibold">Rental Dashboard</h1>
-        <Button variant="primary" className="px-6 py-3 text-xl">
-          <Plus />
-          List New Service
+        <h1 className="text-4xl font-semibold">Dashboard</h1>
+        <Button variant="primary" className="px-6 py-3 text-xl" asChild>
+          <Link href="/my-rentals/new">
+            <Plus />
+            Add New Service
+          </Link>
         </Button>
       </div>
       <div className="flex flex-1 flex-col">

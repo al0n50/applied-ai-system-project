@@ -27,6 +27,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "~/components/ui/pagination";
+import Link from "next/link";
 
 export default function RentalSearchPage() {
   const toggleState = useState<"grid" | "table">("grid");
@@ -153,8 +154,11 @@ const SmallItemDetail = () => (
       <p className="text-neutral-500">Camera Rentals Inc.</p>
       <p className="text-neutral-500">$50/day • 4.8 ⭐</p>
 
-      <Button className="bg-teal-500/60 text-neutral-950 hover:bg-teal-600/70">
-        Book Now
+      <Button
+        asChild
+        className="bg-teal-500/60 text-neutral-950 hover:bg-teal-600/70"
+      >
+        <Link href="/rentals/1">Book Now</Link>
       </Button>
     </div>
   </div>

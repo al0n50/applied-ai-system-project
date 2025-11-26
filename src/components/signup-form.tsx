@@ -19,6 +19,7 @@ import { Input } from "~/components/ui/input";
 import { registerUser } from "~/actions/auth";
 import { useActionState, useState } from "react";
 import { ButtonGroup } from "./ui/button-group";
+import Link from "next/link";
 
 const initState = { message: null };
 
@@ -82,7 +83,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
           <Field>
             <Button type="submit">Create Account</Button>
             <FieldDescription className="px-6 text-center">
-              Already have an account? <a href="/signin">Sign in</a>
+              Already have an account?
+              <Link href="/signin">Sign in</Link>
             </FieldDescription>
           </Field>
         </FieldGroup>
