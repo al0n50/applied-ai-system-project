@@ -1,7 +1,7 @@
 import "server-only";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
-import { users } from "~/server/db/schema";
+import { users, type UserRole } from "~/server/db/schema";
 import bcrypt from "bcrypt";
 
 /**
@@ -46,10 +46,12 @@ export const signup = async ({
   email,
   password,
   name,
+  role,
 }: {
   email: string;
   password: string;
   name?: string;
+  role?: UserRole;
 }) => {
   // Check if user already exists
   const existingUser = await db.query.users.findFirst({
@@ -63,11 +65,17 @@ export const signup = async ({
   const hashedPW = await bcrypt.hash(password, 10);
   const [newUser] = await db
     .insert(users)
-    .values({ email, password: hashedPW, name: name ?? null })
+    .values({
+      email,
+      password: hashedPW,
+      name: name ?? null,
+      role: role ?? "customer",
+    })
     .returning({
       id: users.id,
       email: users.email,
       name: users.name,
+      role: users.role,
       createdAt: users.createdAt,
     });
 

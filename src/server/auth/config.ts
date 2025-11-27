@@ -11,6 +11,7 @@ import {
   sessions,
   users,
   verificationTokens,
+  type UserRole,
 } from "~/server/db/schema";
 
 /**
@@ -24,7 +25,7 @@ declare module "next-auth" {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      role?: UserRole;
     } & DefaultSession["user"];
   }
 
@@ -70,6 +71,7 @@ export const authConfig = {
             email: user.email,
             name: user.name,
             image: user.image,
+            role: user.role,
           };
         } catch (error) {
           console.error("Authorization error:", error);

@@ -10,6 +10,8 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `rentability_${name}`);
 
+export type UserRole = "customer" | "business";
+
 export const users = createTable("user", (d) => ({
   id: d
     .varchar({ length: 255 })
@@ -25,6 +27,11 @@ export const users = createTable("user", (d) => ({
     })
     .default(sql`CURRENT_TIMESTAMP`),
   image: d.varchar({ length: 255 }),
+  role: d
+    .varchar({ length: 32 })
+    .$type<UserRole>()
+    .default(sql`'customer'`)
+    .notNull(),
   password: d.varchar({ length: 255 }),
   createdAt: d
     .timestamp({ mode: "date", withTimezone: true })
