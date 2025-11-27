@@ -1,5 +1,5 @@
 "use client";
-import type { DateRange } from "react-day-picker";
+import type { DateRange, Matcher } from "react-day-picker";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "./ui/field";
@@ -15,6 +15,14 @@ const fakeData = {
   businessName: "Music Central",
   details: "",
 };
+
+const disabledDates: Matcher[] = [
+  new Date("06/09/2025"),
+  {
+    from: new Date("07/20/2025"),
+    to: new Date("07/26/2025"),
+  },
+];
 
 export default function ItemDetails() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -55,6 +63,7 @@ export default function ItemDetails() {
             onSelect={setDateRange}
             numberOfMonths={2}
             className="w-full max-w-2xl self-center rounded-lg border shadow-sm"
+            disabled={disabledDates}
           />
 
           <div className="flex gap-8">
