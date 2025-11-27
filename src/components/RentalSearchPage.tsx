@@ -174,7 +174,13 @@ const SmallItemDetail = () => (
     <Skeleton className="h-36 rounded-none rounded-t-md bg-neutral-200" />
     <div className="flex flex-col gap-1 p-4">
       <h3>Professional DSLR Camera</h3>
-      <p className="text-neutral-500">Camera Rentals Inc.</p>
+      <Button
+        variant="link"
+        asChild
+        className="justify-start p-0 text-neutral-500"
+      >
+        <Link href="/businesses/1">Camera Rentals Inc.</Link>
+      </Button>
       <p className="text-neutral-500">$50/day • 4.8 ⭐</p>
 
       <Button

@@ -6,6 +6,7 @@ import { Field, FieldGroup, FieldLabel, FieldSet } from "./ui/field";
 import { Input } from "./ui/input";
 import { Skeleton } from "./ui/skeleton";
 import { useState } from "react";
+import Link from "next/link";
 
 const fakeData = {
   images: [],
@@ -51,9 +52,11 @@ export default function ItemDetails() {
               {fakeData.amountAvailable} available
             </p>
           </div>
-          <p className="text-neutral-400">
-            Provided by {fakeData.businessName}
-          </p>
+          <Button variant="link" className="p-0 text-neutral-500" asChild>
+            <Link href="/businesses/1">
+              Provided by {fakeData.businessName}
+            </Link>
+          </Button>
 
           {/* Calendar */}
           <Calendar
