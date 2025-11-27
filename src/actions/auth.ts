@@ -17,7 +17,7 @@ export const registerUser = async (prevState: unknown, formData: FormData) => {
     email: formData.get("email"),
     password: formData.get("password"),
     confirmPassword: formData.get("confirm-password"),
-    type: formData.get("type"),
+    type: formData.get("tab"),
     name: formData.get("name"),
   });
 
@@ -30,6 +30,7 @@ export const registerUser = async (prevState: unknown, formData: FormData) => {
       email: data.email,
       password: data.password,
       name: data.name,
+      role: data.type,
     });
   } catch (error) {
     console.error("Registration error:", error);

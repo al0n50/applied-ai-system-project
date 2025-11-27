@@ -20,13 +20,7 @@ export default async function Navbar() {
         <Link href="/">Rentiability</Link>
       </Button>
       <Button asChild variant="link">
-        <Link href="/categories">Categories</Link>
-      </Button>
-      <Button asChild variant="link">
         <Link href="/my-rentals">My Rentals</Link>
-      </Button>
-      <Button asChild variant="link">
-        <Link href="/help">Help</Link>
       </Button>
 
       <InputGroup className="ml-auto max-w-lg">
@@ -53,6 +47,8 @@ export default async function Navbar() {
               <div className="font-medium">
                 {user.user?.email ?? user.user?.name}
               </div>
+              <div className="text-muted-foreground">Role</div>
+              <div className="font-medium capitalize">{user.user?.role}</div>
             </div>
             <DropdownMenuSeparator />
             <DropdownSignOutItem />
