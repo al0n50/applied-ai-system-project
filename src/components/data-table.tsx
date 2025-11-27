@@ -190,6 +190,24 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     ),
   },
   {
+    accessorKey: "usage",
+    header: "Usage",
+    cell: ({ row }) => {
+      // Mock data: calculate usage from id (for demo purposes)
+      const total = (row.original.id % 5) + 3;
+      const used = Math.floor(Math.random() * (total + 1));
+      const usagePercent = total > 0 ? Math.round((used / total) * 100) : 0;
+      return (
+        <div className="flex items-center gap-2">
+          <span className="font-medium">
+            {used} / {total}
+          </span>
+          <span className="text-xs text-muted-foreground">({usagePercent}%)</span>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "target",
     header: () => <div className="w-full text-right">Daily Rate</div>,
     cell: ({ row }) => (

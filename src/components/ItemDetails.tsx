@@ -14,7 +14,22 @@ const fakeData = {
   dayPrice: 25,
   amountAvailable: 3,
   businessName: "Music Central",
-  details: "",
+  details:
+    "High-quality rental service with professional maintenance and care.",
+  businessContact: {
+    phone: "(555) 123-4567",
+    email: "contact@musiccentral.com",
+    address: "123 Music Lane, Harmony City, 98765",
+  },
+  availability: [
+    { day: "Monday", hours: "9:00 AM - 6:00 PM" },
+    { day: "Tuesday", hours: "9:00 AM - 6:00 PM" },
+    { day: "Wednesday", hours: "9:00 AM - 6:00 PM" },
+    { day: "Thursday", hours: "9:00 AM - 6:00 PM" },
+    { day: "Friday", hours: "9:00 AM - 8:00 PM" },
+    { day: "Saturday", hours: "10:00 AM - 8:00 PM" },
+    { day: "Sunday", hours: "Closed" },
+  ],
 };
 
 const disabledDates: Matcher[] = [
@@ -94,9 +109,48 @@ export default function ItemDetails() {
         </form>
       </section>
 
-      <section>
-        <h2>Details</h2>
-        {fakeData.details}
+      <section className="mt-8 space-y-6">
+        <h2 className="mb-4 text-2xl font-bold">Details</h2>
+        <p className="text-neutral-600">{fakeData.details}</p>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="rounded-lg border bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-xl font-semibold">
+              Hours of Availability
+            </h3>
+            <div className="space-y-2">
+              {fakeData.availability.map((schedule) => (
+                <div key={schedule.day} className="flex justify-between">
+                  <span className="font-medium">{schedule.day}</span>
+                  <span className="text-neutral-600">{schedule.hours}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-lg border bg-white p-6 shadow-sm">
+            <h3 className="mb-4 text-xl font-semibold">Contact Owner</h3>
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm text-neutral-500">Phone</p>
+                <p className="font-medium">{fakeData.businessContact.phone}</p>
+              </div>
+              <div>
+                <p className="text-sm text-neutral-500">Email</p>
+                <p className="font-medium">{fakeData.businessContact.email}</p>
+              </div>
+              <div>
+                <p className="text-sm text-neutral-500">Address</p>
+                <p className="font-medium">
+                  {fakeData.businessContact.address}
+                </p>
+              </div>
+              <Button className="mt-4 w-full bg-blue-500 hover:bg-blue-600">
+                Send Message
+              </Button>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   );

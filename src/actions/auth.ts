@@ -82,4 +82,5 @@ export const signin = async (prevState: unknown, formData: FormData) => {
 
 export const signout = async () => {
   await signOut();
+  redirect("/signin");
 };
