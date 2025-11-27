@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, Grid2X2, Table } from "lucide-react";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
 import { Skeleton } from "./ui/skeleton";
 import { Checkbox } from "./ui/checkbox";
@@ -32,7 +32,7 @@ import type { DateRange } from "react-day-picker";
 import { Calendar } from "./ui/calendar";
 
 export default function RentalSearchPage() {
-  const toggleState = useState<"grid" | "table">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(2025, 5, 12),
@@ -125,7 +125,14 @@ export default function RentalSearchPage() {
             </SelectContent>
           </Select>
 
-          <ToggleButtonGroup state={toggleState} />
+          <ToggleButtonGroup
+            options={[
+              { value: "grid", icon: Grid2X2 },
+              { value: "table", icon: Table },
+            ]}
+            value={viewMode}
+            onChange={setViewMode}
+          />
         </div>
 
         <div className="grid grid-cols-4 gap-8">

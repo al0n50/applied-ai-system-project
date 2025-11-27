@@ -1,32 +1,41 @@
 "use client";
-import { Grid2X2, Table } from "lucide-react";
 import { Button } from "./ui/button";
 import { ButtonGroup } from "./ui/button-group";
+import type { LucideIcon } from "lucide-react";
 
-type Props = {
-  state: [
-    "grid" | "table",
-    React.Dispatch<React.SetStateAction<"grid" | "table">>,
-  ];
+type ToggleOption<T extends string> = {
+  value: T;
+  icon?: LucideIcon;
+  label?: string;
 };
-export default function ToggleButtonGroup({ state }: Props) {
-  const [toggleState, setState] = state;
+
+type Props<T extends string> = {
+  options: ToggleOption<T>[];
+  value: T;
+  onChange: (value: T) => void;
+};
+
+export default function ToggleButtonGroup<T extends string>({
+  options,
+  value,
+  onChange,
+}: Props<T>) {
   return (
     <ButtonGroup>
-      <Button
-        variant={toggleState === "grid" ? "primary" : "outline"}
-        onClick={() => setState("grid")}
-        aria-pressed={toggleState === "grid"}
-      >
-        <Grid2X2 />
-      </Button>
-      <Button
-        variant={toggleState === "table" ? "primary" : "outline"}
-        onClick={() => setState("table")}
-        aria-pressed={toggleState === "table"}
-      >
-        <Table />
-      </Button>
+      {options.map((option) => {
+        const Icon = option.icon;
+        return (
+          <Button
+            key={option.value}
+            variant={value === option.value ? "primary" : "outline"}
+            onClick={() => onChange(option.value)}
+            aria-pressed={value === option.value}
+          >
+            {Icon && <Icon />}
+            {option.label}
+          </Button>
+        );
+      })}
     </ButtonGroup>
   );
 }
