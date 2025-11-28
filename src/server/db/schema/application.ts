@@ -39,6 +39,8 @@ export const businessesRelations = relations(businesses, ({ one, many }) => ({
 }));
 
 // * Service Table
+export type ServiceCategory = "vehicles" | "equipment" | "spaces";
+
 export const services = createTable(
   "service",
   (d) => ({
@@ -53,6 +55,7 @@ export const services = createTable(
       .references(() => businesses.userId, { onDelete: "cascade" }),
     name: d.varchar({ length: 255 }).notNull(),
     description: d.text(),
+    category: d.varchar({ length: 32 }).$type<ServiceCategory>().notNull(),
     costPerDay: d.integer().notNull(), // Store in cents to avoid decimal issues
     totalQuantity: d.integer().notNull().default(1), // Total available quantity
     images: d.varchar({ length: 500 }).array(), // Array of image URLs
@@ -65,7 +68,10 @@ export const services = createTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   }),
-  (t) => [index("svc_biz_idx").on(t.businessId)],
+  (t) => [
+    index("svc_biz_idx").on(t.businessId),
+    index("svc_cat_idx").on(t.category),
+  ],
 );
 
 export const servicesRelations = relations(services, ({ one, many }) => ({

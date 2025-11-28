@@ -95,26 +95,36 @@ async function main() {
   console.log("✅ Created businesses");
 
   // Create services
-  const serviceNames = [
-    "Kayak",
-    "Paddleboard",
-    "Bicycle",
-    "Tent",
-    "Camping Gear",
-    "Photography Equipment",
-    "Party Supplies",
-    "Sound System",
-    "Projector",
-    "Conference Room",
-    "Power Tools",
-    "Lawn Equipment",
-    "Car",
-    "Van",
-    "Truck",
-    "Motorcycle",
-    "Scooter",
-    "E-Bike",
-  ];
+  const servicesByCategory = {
+    vehicles: [
+      "Car",
+      "Van",
+      "Truck",
+      "Motorcycle",
+      "Scooter",
+      "E-Bike",
+      "Bicycle",
+      "Kayak",
+    ],
+    equipment: [
+      "Paddleboard",
+      "Tent",
+      "Camping Gear",
+      "Photography Equipment",
+      "Party Supplies",
+      "Sound System",
+      "Projector",
+      "Power Tools",
+      "Lawn Equipment",
+    ],
+    spaces: [
+      "Conference Room",
+      "Event Space",
+      "Meeting Room",
+      "Workshop Space",
+      "Studio Space",
+    ],
+  };
 
   const serviceDescriptions = [
     "Perfect for outdoor adventures",
@@ -127,15 +137,24 @@ async function main() {
     "Affordable and reliable",
   ];
 
-  const serviceRecords = Array.from({ length: 200 }, () => ({
-    id: crypto.randomUUID(),
-    businessId: random(allBusinessUsers).id,
-    name: random(serviceNames),
-    description: random(serviceDescriptions),
-    costPerDay: randomInt(1000, 50000),
-    totalQuantity: randomInt(1, 20),
-    images: [],
-  }));
+  const serviceRecords = Array.from({ length: 200 }, () => {
+    const categories = Object.keys(servicesByCategory) as Array<
+      keyof typeof servicesByCategory
+    >;
+    const category = random(categories);
+    const name = random(servicesByCategory[category]);
+
+    return {
+      id: crypto.randomUUID(),
+      businessId: random(allBusinessUsers).id,
+      name,
+      category,
+      description: random(serviceDescriptions),
+      costPerDay: randomInt(1000, 50000),
+      totalQuantity: randomInt(1, 20),
+      images: [],
+    };
+  });
 
   await db.insert(services).values(serviceRecords);
   console.log("✅ Created services");
