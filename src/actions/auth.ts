@@ -13,13 +13,19 @@ const authSchema = z.object({
 });
 
 export const registerUser = async (prevState: unknown, formData: FormData) => {
-  const data = authSchema.parse({
+  const { data, success, error } = authSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
     confirmPassword: formData.get("confirm-password"),
     type: formData.get("tab"),
     name: formData.get("name"),
   });
+
+  if (!success) {
+    console.log(typeof error.issues);
+    const message = error.issues.map((issue) => issue.message).join(", ");
+    return { message };
+  }
 
   if (data.password !== data.confirmPassword) {
     return { message: "Passwords do not match" };
