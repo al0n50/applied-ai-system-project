@@ -1,5 +1,5 @@
 import NewRental from "~/components/NewRental";
 
-export default function NewRentalPage() {
+export default async function NewRentalPage() {
   return <NewRental />;
 }

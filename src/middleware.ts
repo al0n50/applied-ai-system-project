@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
         },
       });
 
-      const data = (await response.json()) as { valid: boolean };
+      const data = (await response.json()) as { valid: boolean; role?: string };
 
       if (response.ok && data.valid) {
         // Valid session exists, redirect to callback URL or root route
@@ -79,7 +79,7 @@ export async function middleware(request: NextRequest) {
       },
     });
 
-    const data = (await response.json()) as { valid: boolean };
+    const data = (await response.json()) as { valid: boolean; role?: string };
 
     if (!response.ok || !data.valid) {
       // Session is invalid or expired, remove the invalid session cookie and redirect to signin
@@ -95,6 +95,12 @@ export async function middleware(request: NextRequest) {
         path: "/",
       });
       return redirectResponse;
+    }
+
+    // Check role-based access for specific routes
+    if (pathname === "/my-rentals/new" && data.role !== "business") {
+      // Non-business users cannot access this route
+      return NextResponse.redirect(new URL("/my-rentals", request.url));
     }
   } catch (error) {
     console.error("Session verification failed:", error);
@@ -118,6 +124,10 @@ export const config = {
   matcher: [
     // Protected Routes
     "/",
+    "/business/:path*",
+    "/my-rentals/:path*",
+    "/rentals/:path*",
+
     // Auth Routes
     "/signin/:path*",
     "/signup/:path*",

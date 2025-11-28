@@ -17,13 +17,19 @@ export async function GET(request: NextRequest) {
         eq(sessions.sessionToken, sessionToken),
         gt(sessions.expires, new Date()),
       ),
+      with: {
+        user: true,
+      },
     });
 
     if (!userSession) {
       return NextResponse.json({ valid: false }, { status: 401 });
     }
 
-    return NextResponse.json({ valid: true }, { status: 200 });
+    return NextResponse.json(
+      { valid: true, role: userSession.user.role },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Session verification error:", error);
     return NextResponse.json({ valid: false }, { status: 500 });
