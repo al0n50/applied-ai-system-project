@@ -9,10 +9,9 @@ import { db } from "~/server/db";
 import {
   accounts,
   sessions,
-  users,
   verificationTokens,
-  type UserRole,
-} from "~/server/db/schema";
+} from "~/server/db/schema/auth";
+import { users, type UserRole } from "~/server/db/schema/application";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`

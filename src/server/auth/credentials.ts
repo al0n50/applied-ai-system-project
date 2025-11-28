@@ -1,7 +1,7 @@
 import "server-only";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
-import { users, type UserRole } from "~/server/db/schema";
+import { users, type UserRole } from "~/server/db/schema/application";
 import bcrypt from "bcrypt";
 
 /**
