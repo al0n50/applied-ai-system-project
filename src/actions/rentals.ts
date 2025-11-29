@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod/v4";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
-import { rentals, services } from "~/server/db/schema";
+import { rentals, services, businesses } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
 import type { InferSelectModel } from "drizzle-orm";
 
@@ -25,7 +25,10 @@ export const createRental = async (prevState: unknown, formData: FormData) => {
 
   // Prevent business users from booking services
   if (session.user.role === "business") {
-    return { message: "Business accounts cannot book services. Please use a customer account." };
+    return {
+      message:
+        "Business accounts cannot book services. Please use a customer account.",
+    };
   }
 
   // Parse and validate form data
@@ -98,6 +101,95 @@ export const createRental = async (prevState: unknown, formData: FormData) => {
   }
 
   redirect("/my-rentals");
+};
+
+const createServiceSchema = z.object({
+  name: z.string().min(1, "Service name is required"),
+  description: z.string().optional(),
+  category: z.enum(["vehicles", "equipment", "spaces"]),
+  costPerDay: z.string().min(1, "Daily rate is required"),
+  totalQuantity: z.coerce
+    .number()
+    .min(1, "Quantity must be at least 1")
+    .default(1),
+});
+
+export const createService = async (prevState: unknown, formData: FormData) => {
+  // Get current user session
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return { message: "You must be signed in to create a service" };
+  }
+
+  // Only business users can create services
+  if (session.user.role !== "business") {
+    return { message: "Only business accounts can create services." };
+  }
+
+  // Parse and validate form data
+  const { data, success, error } = createServiceSchema.safeParse({
+    name: formData.get("name"),
+    description: formData.get("description"),
+    category: formData.get("category"),
+    costPerDay: formData.get("costPerDay"),
+    totalQuantity: formData.get("totalQuantity") ?? "1",
+  });
+
+  if (!success) {
+    const message = error.issues.map((issue) => issue.message).join(", ");
+    return { message };
+  }
+
+  // Parse daily rate (convert from dollars to cents)
+  const parseDollarsToCents = (value: string | undefined): number => {
+    if (!value || value.trim() === "") return 0;
+    const cleaned = value.replace(/[$,]/g, "");
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : Math.round(parsed * 100);
+  };
+
+  const costPerDay = parseDollarsToCents(data.costPerDay);
+
+  if (costPerDay <= 0) {
+    return { message: "Daily rate must be greater than 0" };
+  }
+
+  // Check if business exists
+  const business = await db.query.businesses.findFirst({
+    where: eq(businesses.userId, session.user.id),
+  });
+
+  if (!business) {
+    return {
+      message:
+        "Business profile not found. Please complete your business profile first.",
+    };
+  }
+
+  try {
+    // Create service
+    await db.insert(services).values({
+      businessId: session.user.id,
+      name: data.name,
+      description: data.description ?? null,
+      category: data.category,
+      costPerDay,
+      totalQuantity: data.totalQuantity,
+      images: null, // TODO: Handle image uploads later
+    });
+
+    console.log("Service created successfully");
+  } catch (error) {
+    console.error("Error creating service:", error);
+    if (error instanceof Error) {
+      return { message: error.message };
+    }
+    return { message: "Failed to create service. Please try again." };
+  }
+
+  // Redirect on success (outside try-catch since redirect throws)
+  redirect("/");
 };
 
 export type CustomerRental = InferSelectModel<typeof rentals> & {
