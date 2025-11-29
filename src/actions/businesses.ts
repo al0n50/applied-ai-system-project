@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "~/server/db";
-import { businesses, services } from "~/server/db/schema";
+import { businesses, type services } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
 import type { InferSelectModel } from "drizzle-orm";
 
