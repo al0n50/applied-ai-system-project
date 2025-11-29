@@ -23,6 +23,11 @@ export const createRental = async (prevState: unknown, formData: FormData) => {
     return { message: "You must be signed in to create a rental" };
   }
 
+  // Prevent business users from booking services
+  if (session.user.role === "business") {
+    return { message: "Business accounts cannot book services. Please use a customer account." };
+  }
+
   // Parse and validate form data
   const { data, success, error } = createRentalSchema.safeParse({
     serviceId: formData.get("serviceId"),
