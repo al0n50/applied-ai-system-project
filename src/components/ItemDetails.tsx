@@ -10,6 +10,7 @@ import Link from "next/link";
 import { createRental } from "~/actions/rentals";
 import { useActionState } from "react";
 import SubmitButton from "./SubmitButton";
+import Image from "next/image";
 
 type Service = {
   id: string;
@@ -143,74 +144,114 @@ export default function ItemDetails({
     if (!date) return "";
     return date.toISOString().split("T")[0];
   };
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const images =
+    service.images && service.images.length > 0 ? service.images : [];
+  const hasImages = images.length > 0;
+
   return (
     <main className="mx-auto max-w-7xl p-12">
       <section className="justify-center gap-16 lg:flex">
         <div className="space-y-4 pb-4">
-          <Skeleton className="flex h-[28rem] w-[28rem] items-center justify-center rounded-lg bg-neutral-200 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
-            <div className="text-center">
-              <svg
-                className="mx-auto h-20 w-20"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <p className="mt-2 text-sm">No Image Available</p>
+          {hasImages ? (
+            <div className="relative h-[28rem] w-[28rem] overflow-hidden rounded-lg bg-neutral-200">
+              <Image
+                src={images[selectedImageIndex]!}
+                alt={`${service.name} - Image ${selectedImageIndex + 1}`}
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
-          </Skeleton>
+          ) : (
+            <Skeleton className="flex h-[28rem] w-[28rem] items-center justify-center rounded-lg bg-neutral-200 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
+              <div className="text-center">
+                <svg
+                  className="mx-auto h-20 w-20"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <p className="mt-2 text-sm">No Image Available</p>
+              </div>
+            </Skeleton>
+          )}
           <div className="flex gap-4">
-            <Skeleton className="flex h-[6rem] w-[6rem] items-center justify-center rounded-lg bg-neutral-200 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
-              <svg
-                className="h-8 w-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </Skeleton>
-            <Skeleton className="flex h-[6rem] w-[6rem] items-center justify-center rounded-lg bg-neutral-200 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
-              <svg
-                className="h-8 w-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </Skeleton>
-            <Skeleton className="flex h-[6rem] w-[6rem] items-center justify-center rounded-lg bg-neutral-200 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
-              <svg
-                className="h-8 w-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-            </Skeleton>
+            {hasImages ? (
+              images.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImageIndex(index)}
+                  className={`relative h-[6rem] w-[6rem] overflow-hidden rounded-lg transition-all ${
+                    selectedImageIndex === index
+                      ? "ring-2 ring-blue-500"
+                      : "opacity-60 hover:opacity-100"
+                  }`}
+                >
+                  <Image
+                    src={image}
+                    alt={`${service.name} thumbnail ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))
+            ) : (
+              <>
+                <Skeleton className="flex h-[6rem] w-[6rem] items-center justify-center rounded-lg bg-neutral-200 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
+                  <svg
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </Skeleton>
+                <Skeleton className="flex h-[6rem] w-[6rem] items-center justify-center rounded-lg bg-neutral-200 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
+                  <svg
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </Skeleton>
+                <Skeleton className="flex h-[6rem] w-[6rem] items-center justify-center rounded-lg bg-neutral-200 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
+                  <svg
+                    className="h-8 w-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
+                </Skeleton>
+              </>
+            )}
           </div>
         </div>
 
