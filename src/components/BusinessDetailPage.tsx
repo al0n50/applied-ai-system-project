@@ -65,29 +65,58 @@ export default function BusinessDetailPage({
       <main className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-8 lg:grid-cols-4 lg:gap-y-16">
         {/* Hero Section */}
         <div
-          className="col-span-full flex h-64 items-end bg-neutral-300 bg-cover bg-center p-12"
+          className="relative col-span-full flex h-64 items-end bg-neutral-300 bg-cover bg-center p-12"
           style={{
             backgroundImage: business.backgroundImage
               ? `url(${business.backgroundImage})`
               : undefined,
           }}
         >
-          <div className="ml-20">
-            <div className="flex items-center gap-4">
-              {business.logo && (
+          {/* Gradient overlay for better text readability */}
+          {business.backgroundImage && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          )}
+
+          {!business.backgroundImage && (
+            <div className="absolute inset-0 flex items-center justify-center text-neutral-500 dark:text-neutral-400">
+              <div className="text-center">
+                <svg
+                  className="mx-auto h-16 w-16 text-neutral-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <p className="mt-2 text-sm">No background image</p>
+              </div>
+            </div>
+          )}
+          <div className="relative z-10 ml-20">
+            <div className="flex items-center gap-4 rounded-lg bg-black/30 p-6 backdrop-blur-sm">
+              {business.logo ? (
                 <Image
                   src={business.logo}
                   alt={`${business.name} logo`}
                   width={64}
                   height={64}
-                  className="size-16 rounded-full bg-white object-cover"
+                  className="size-16 rounded-full bg-white object-cover ring-2 ring-white/20"
                 />
+              ) : (
+                <div className="flex size-16 items-center justify-center rounded-full bg-white text-2xl font-bold text-neutral-400 ring-2 ring-white/20">
+                  {business.name.charAt(0).toUpperCase()}
+                </div>
               )}
               <div>
-                <h1 className="text-3xl font-bold text-neutral-800 dark:text-white">
+                <h1 className="text-3xl font-bold text-white drop-shadow-lg">
                   {business.name}
                 </h1>
-                <p className="text-neutral-500 dark:text-neutral-300">
+                <p className="text-white/90 drop-shadow-md">
                   Your trusted partner for quality rentals.
                 </p>
               </div>
@@ -205,7 +234,22 @@ export default function BusinessDetailPage({
                     />
                   ) : (
                     <Skeleton className="flex size-full h-48 items-center justify-center bg-neutral-300 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
-                      No Image
+                      <div className="text-center">
+                        <svg
+                          className="mx-auto h-12 w-12"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        <p className="mt-2 text-xs">No Image</p>
+                      </div>
                     </Skeleton>
                   )}
 

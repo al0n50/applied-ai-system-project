@@ -83,12 +83,34 @@ async function main() {
 
   // Create businesses for business users
   const allBusinessUsers = [testBusiness, ...businessUsers];
+
+  // Business images
+  const businessLogos = [
+    "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=200&h=200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1599305446868-59e861548a8c?w=200&h=200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=200&h=200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200&h=200&auto=format&fit=crop",
+  ];
+
+  const businessBackgrounds = [
+    "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1568992687947-868a62a9f521?w=1200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1541746972996-4e0b0f43e02a?w=1200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=1200&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&auto=format&fit=crop",
+  ];
+
   const businessRecords = allBusinessUsers.map((user) => ({
     userId: user.id,
     name: `${user.name}'s Company`,
     address: `${randomInt(100, 9999)} Main St, City, ST ${randomInt(10000, 99999)}`,
     phoneNumber: `(${randomInt(200, 999)}) ${randomInt(200, 999)}-${randomInt(1000, 9999)}`,
     email: user.email,
+    logo: random(businessLogos),
+    backgroundImage: random(businessBackgrounds),
   }));
 
   await db.insert(businesses).values(businessRecords);
@@ -126,6 +148,126 @@ async function main() {
     ],
   };
 
+  // Images for each service type
+  const serviceImages = {
+    vehicles: {
+      Car: [
+        "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&auto=format&fit=crop",
+      ],
+      Van: [
+        "https://images.unsplash.com/photo-1527786356703-4b100091cd2c?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=800&auto=format&fit=crop",
+      ],
+      Truck: [
+        "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1615906655593-ad0386982a0f?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1506836467174-27f1042aa48c?w=800&auto=format&fit=crop",
+      ],
+      Motorcycle: [
+        "https://images.unsplash.com/photo-1558981359-219d6364c9c8?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=800&auto=format&fit=crop",
+      ],
+      Scooter: [
+        "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1600677572515-4a6a5e46be8e?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1613231147055-e1e0e5a4a2f3?w=800&auto=format&fit=crop",
+      ],
+      "E-Bike": [
+        "https://images.unsplash.com/photo-1571333250630-f0230c320b6d?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1617646773810-3f5c3f583b88?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1611857680934-f1c9d8b7e0c5?w=800&auto=format&fit=crop",
+      ],
+      Bicycle: [
+        "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1511994298241-608e28f14fde?w=800&auto=format&fit=crop",
+      ],
+      Kayak: [
+        "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1600698645440-5b80fdcf17e7?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1593642532973-d31b6557fa68?w=800&auto=format&fit=crop",
+      ],
+    },
+    equipment: {
+      Paddleboard: [
+        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1621964342398-eb3ef5a4d7c0?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800&auto=format&fit=crop",
+      ],
+      Tent: [
+        "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1487730116645-74489c95b41b?w=800&auto=format&fit=crop",
+      ],
+      "Camping Gear": [
+        "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1537565732439-e3cd6e0cab1b?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1508873696983-2dfd5898f08b?w=800&auto=format&fit=crop",
+      ],
+      "Photography Equipment": [
+        "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1606810195680-74e16a78e51b?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1617005082133-548c4dd27f35?w=800&auto=format&fit=crop",
+      ],
+      "Party Supplies": [
+        "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&auto=format&fit=crop",
+      ],
+      "Sound System": [
+        "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=800&auto=format&fit=crop",
+      ],
+      Projector: [
+        "https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1602524206684-76b7beb48c43?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&auto=format&fit=crop",
+      ],
+      "Power Tools": [
+        "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1572981779307-38b8cabb2407?w=800&auto=format&fit=crop",
+      ],
+      "Lawn Equipment": [
+        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1599629954294-1cde951f7e3e?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&auto=format&fit=crop",
+      ],
+    },
+    spaces: {
+      "Conference Room": [
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1431540015161-0bf868a2d407?w=800&auto=format&fit=crop",
+      ],
+      "Event Space": [
+        "https://images.unsplash.com/photo-1505236858219-8359eb29e329?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=800&auto=format&fit=crop",
+      ],
+      "Meeting Room": [
+        "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1431540015161-0bf868a2d407?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1556761175-4b46a572b786?w=800&auto=format&fit=crop",
+      ],
+      "Workshop Space": [
+        "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800&auto=format&fit=crop",
+      ],
+      "Studio Space": [
+        "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1493932484895-752d1471eab5?w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?w=800&auto=format&fit=crop",
+      ],
+    },
+  };
+
   const serviceDescriptions = [
     "Perfect for outdoor adventures",
     "High quality equipment for rent",
@@ -144,6 +286,12 @@ async function main() {
     const category = random(categories);
     const name = random(servicesByCategory[category]);
 
+    // Get images for this specific service type
+    const imagesForService =
+      serviceImages[category][
+        name as keyof (typeof serviceImages)[typeof category]
+      ] || [];
+
     return {
       id: crypto.randomUUID(),
       businessId: random(allBusinessUsers).id,
@@ -152,7 +300,7 @@ async function main() {
       description: random(serviceDescriptions),
       costPerDay: randomInt(1000, 50000),
       totalQuantity: randomInt(1, 20),
-      images: [],
+      images: imagesForService,
     };
   });
 
