@@ -192,6 +192,170 @@ export const createService = async (prevState: unknown, formData: FormData) => {
   redirect("/");
 };
 
+const updateServiceSchema = z.object({
+  id: z.string().min(1, "Service ID is required"),
+  name: z.string().min(1, "Service name is required"),
+  description: z.string().optional(),
+  category: z.enum(["vehicles", "equipment", "spaces"]),
+  costPerDay: z.string().min(1, "Daily rate is required"),
+  totalQuantity: z.coerce
+    .number()
+    .min(1, "Quantity must be at least 1")
+    .default(1),
+});
+
+export const updateService = async (prevState: unknown, formData: FormData) => {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      message: "You must be signed in to update a service",
+    };
+  }
+
+  if (session.user.role !== "business") {
+    return {
+      success: false,
+      message: "Only business accounts can update services.",
+    };
+  }
+
+  const { data, success, error } = updateServiceSchema.safeParse({
+    id: formData.get("id"),
+    name: formData.get("name"),
+    description: formData.get("description"),
+    category: formData.get("category"),
+    costPerDay: formData.get("costPerDay"),
+    totalQuantity: formData.get("totalQuantity") ?? "1",
+  });
+
+  if (!success) {
+    const message = error.issues.map((issue) => issue.message).join(", ");
+    return { success: false, message };
+  }
+
+  const parseDollarsToCents = (value: string | undefined): number => {
+    if (!value || value.trim() === "") return 0;
+    const cleaned = value.replace(/[$,]/g, "");
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : Math.round(parsed * 100);
+  };
+
+  const costPerDay = parseDollarsToCents(data.costPerDay);
+
+  if (costPerDay <= 0) {
+    return { success: false, message: "Daily rate must be greater than 0" };
+  }
+
+  try {
+    // Verify the service belongs to this business
+    const existingService = await db.query.services.findFirst({
+      where: eq(services.id, data.id),
+    });
+
+    if (!existingService) {
+      return { success: false, message: "Service not found" };
+    }
+
+    if (existingService.businessId !== session.user.id) {
+      return {
+        success: false,
+        message: "Unauthorized: This service does not belong to you",
+      };
+    }
+
+    // Update service
+    await db
+      .update(services)
+      .set({
+        name: data.name,
+        description: data.description ?? null,
+        category: data.category,
+        costPerDay,
+        totalQuantity: data.totalQuantity,
+        updatedAt: new Date(),
+      })
+      .where(eq(services.id, data.id));
+
+    return { success: true, message: "Service updated successfully" };
+  } catch (error) {
+    console.error("Error updating service:", error);
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+    return {
+      success: false,
+      message: "Failed to update service. Please try again.",
+    };
+  }
+};
+
+export const deleteService = async (serviceId: string) => {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      message: "You must be signed in to delete a service",
+    };
+  }
+
+  if (session.user.role !== "business") {
+    return {
+      success: false,
+      message: "Only business accounts can delete services.",
+    };
+  }
+
+  try {
+    // Verify the service belongs to this business
+    const service = await db.query.services.findFirst({
+      where: eq(services.id, serviceId),
+      with: {
+        rentals: true,
+      },
+    });
+
+    if (!service) {
+      return { success: false, message: "Service not found" };
+    }
+
+    if (service.businessId !== session.user.id) {
+      return {
+        success: false,
+        message: "Unauthorized: This service does not belong to you",
+      };
+    }
+
+    // Check if service has any active or pending bookings
+    const hasActiveBookings = service.rentals.some(
+      (rental) => rental.status === "active" || rental.status === "pending",
+    );
+
+    if (hasActiveBookings) {
+      return {
+        success: false,
+        message: "Cannot delete service with active or pending bookings",
+      };
+    }
+
+    // Delete service
+    await db.delete(services).where(eq(services.id, serviceId));
+
+    return { success: true, message: "Service deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting service:", error);
+    if (error instanceof Error) {
+      return { success: false, message: error.message };
+    }
+    return {
+      success: false,
+      message: "Failed to delete service. Please try again.",
+    };
+  }
+};
+
 export type CustomerRental = InferSelectModel<typeof rentals> & {
   service: InferSelectModel<typeof services> & {
     business: {

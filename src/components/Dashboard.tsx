@@ -13,21 +13,29 @@ export default async function Dashboard({
   const services = await getDashboardData(businessUserId);
 
   // Transform services data to match the expected DataTable format
-  // Using a counter for unique IDs since the schema expects number IDs
-  let idCounter = 1;
-  const tableData = services.map((service) => ({
-    id: idCounter++,
-    header: service.name,
-    type:
-      (service.category as string).charAt(0).toUpperCase() +
-      (service.category as string).slice(1),
-    status: service.rentals.some((r) => r.status === "active")
-      ? "Booked"
-      : "Available",
-    target: `$${(service.costPerDay / 100).toFixed(0)}`,
-    limit: `$${((service.costPerDay / 100) * 1.5).toFixed(0)}`, // Weekend rate is 1.5x
-    reviewer: "Business Owner",
-  }));
+  const tableData = services.map((service) => {
+    const categoryStr = String(service.category);
+    return {
+      id: service.id, // Use actual service ID
+      header: service.name,
+      description: service.description,
+      type: categoryStr.charAt(0).toUpperCase() + categoryStr.slice(1),
+      category: service.category as string,
+      status: service.rentals.some(
+        (r) => r.status === "active" || r.status === "pending",
+      )
+        ? "Booked"
+        : "Available",
+      target: `$${(service.costPerDay / 100).toFixed(2)}`,
+      costPerDay: service.costPerDay,
+      totalQuantity: service.totalQuantity,
+      limit: `$${((service.costPerDay / 100) * 1.5).toFixed(2)}`, // Weekend rate is 1.5x
+      reviewer: "Business Owner",
+      hasActiveBookings: service.rentals.some(
+        (r) => r.status === "active" || r.status === "pending",
+      ),
+    };
+  });
 
   // Calculate summary statistics from all rentals across all services
   const allRentals = services.flatMap((s) => s.rentals);

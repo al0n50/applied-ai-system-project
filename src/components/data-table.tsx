@@ -95,17 +95,22 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 export const schema = z.object({
-  id: z.number(),
+  id: z.string(),
   header: z.string(),
+  description: z.string().nullable(),
   type: z.string(),
+  category: z.string(),
   status: z.string(),
   target: z.string(),
+  costPerDay: z.number(),
+  totalQuantity: z.number(),
   limit: z.string(),
   reviewer: z.string(),
+  hasActiveBookings: z.boolean(),
 });
 
 // Create a separate component for the drag handle
-function DragHandle({ id }: { id: number }) {
+function DragHandle({ id }: { id: string }) {
   const { attributes, listeners } = useSortable({
     id,
   });
@@ -193,16 +198,18 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     accessorKey: "usage",
     header: "Usage",
     cell: ({ row }) => {
-      // Mock data: calculate usage from id (for demo purposes)
-      const total = (row.original.id % 5) + 3;
-      const used = Math.floor(Math.random() * (total + 1));
+      const total = row.original.totalQuantity;
+      // For now, show as available (0 used) unless booked
+      const used = row.original.status === "Booked" ? 1 : 0;
       const usagePercent = total > 0 ? Math.round((used / total) * 100) : 0;
       return (
         <div className="flex items-center gap-2">
           <span className="font-medium">
             {used} / {total}
           </span>
-          <span className="text-xs text-muted-foreground">({usagePercent}%)</span>
+          <span className="text-muted-foreground text-xs">
+            ({usagePercent}%)
+          </span>
         </div>
       );
     },
@@ -291,27 +298,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+    cell: ({ row }) => <ActionsMenu row={row.original} />,
   },
 ];
 
@@ -379,7 +366,7 @@ export function DataTable({
       columnFilters,
       pagination,
     },
-    getRowId: (row) => row.id.toString(),
+    getRowId: (row) => row.id,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -631,22 +618,138 @@ export function DataTable({
   );
 }
 
-function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
-  const isMobile = useIsMobile();
+function ActionsMenu({ row }: { row: z.infer<typeof schema> }) {
+  const [isDeleting, setIsDeleting] = React.useState(false);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this service?")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const { deleteService } = await import("~/actions/rentals");
+      const result = await deleteService(row.id);
+
+      if (result.success) {
+        toast.success(result.message);
+        window.location.reload();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error("Failed to delete service");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
-    <Drawer direction={isMobile ? "bottom" : "right"}>
-      <DrawerTrigger asChild>
-        <Button variant="link" className="text-foreground w-fit px-0 text-left">
-          {item.header}
-        </Button>
-      </DrawerTrigger>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+            size="icon"
+          >
+            <IconDotsVertical />
+            <span className="sr-only">Open menu</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-32">
+          <DropdownMenuItem onClick={() => setDrawerOpen(true)}>
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={row.hasActiveBookings || isDeleting}
+          >
+            {isDeleting ? "Deleting..." : "Delete"}
+          </DropdownMenuItem>
+          {row.hasActiveBookings && (
+            <div className="text-muted-foreground px-2 py-1.5 text-xs">
+              Cannot delete service with active bookings
+            </div>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <EditServiceDrawer
+        item={row}
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+      />
+    </>
+  );
+}
+
+function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <>
+      <Button
+        variant="link"
+        className="text-foreground w-fit px-0 text-left"
+        onClick={() => setOpen(true)}
+      >
+        {item.header}
+      </Button>
+      <EditServiceDrawer item={item} open={open} onOpenChange={setOpen} />
+    </>
+  );
+}
+
+function EditServiceDrawer({
+  item,
+  open,
+  onOpenChange,
+}: {
+  item: z.infer<typeof schema>;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const isMobile = useIsMobile();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      const { updateService } = await import("~/actions/rentals");
+      const result = await updateService({}, formData);
+
+      if (result.success) {
+        toast.success(result.message);
+        onOpenChange(false);
+        window.location.reload();
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      toast.error("Failed to update service");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Drawer
+      direction={isMobile ? "bottom" : "right"}
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       <DrawerContent>
         <DrawerHeader className="gap-1">
           <DrawerTitle>{item.header}</DrawerTitle>
-          <DrawerDescription>
-            View and edit rental service details
-          </DrawerDescription>
+          <DrawerDescription>Edit rental service details</DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           {!isMobile && (
@@ -654,86 +757,99 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
               <Separator />
               <div className="grid gap-2">
                 <div className="flex gap-2 leading-none font-medium">
-                  Booking rate up by 12% this month{" "}
-                  <IconTrendingUp className="size-4" />
+                  Service Status: {item.status}
+                  {item.status === "Available" && (
+                    <IconCircleCheckFilled className="size-4 fill-green-500 dark:fill-green-400" />
+                  )}
                 </div>
                 <div className="text-muted-foreground">
-                  This service has been consistently popular with customers.
-                  Average rental duration is 3 days with a 4.8 star rating.
+                  {item.hasActiveBookings
+                    ? "This service has active bookings. Some changes may be restricted."
+                    : "No active bookings for this service."}
                 </div>
               </div>
               <Separator />
             </>
           )}
-          <form className="flex flex-col gap-4">
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-4"
+            id="edit-service-form"
+          >
+            <input type="hidden" name="id" value={item.id} />
+
             <div className="flex flex-col gap-3">
-              <Label htmlFor="header">Service Name</Label>
-              <Input id="header" defaultValue={item.header} />
+              <Label htmlFor="name">Service Name *</Label>
+              <Input
+                id="name"
+                name="name"
+                defaultValue={item.header}
+                required
+              />
             </div>
+
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                name="description"
+                defaultValue={item.description ?? ""}
+              />
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
-                <Label htmlFor="type">Category</Label>
-                <Select defaultValue={item.type}>
-                  <SelectTrigger id="type" className="w-full">
+                <Label htmlFor="category">Category *</Label>
+                <Select name="category" defaultValue={item.category} required>
+                  <SelectTrigger id="category" className="w-full">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Equipment">Equipment</SelectItem>
-                    <SelectItem value="Photography">Photography</SelectItem>
-                    <SelectItem value="Event Space">Event Space</SelectItem>
-                    <SelectItem value="Automotive">Automotive</SelectItem>
-                    <SelectItem value="Sports">Sports</SelectItem>
-                    <SelectItem value="Party Equipment">
-                      Party Equipment
-                    </SelectItem>
-                    <SelectItem value="Water Sports">Water Sports</SelectItem>
-                    <SelectItem value="Electronics">Electronics</SelectItem>
+                    <SelectItem value="vehicles">Vehicles</SelectItem>
+                    <SelectItem value="equipment">Equipment</SelectItem>
+                    <SelectItem value="spaces">Spaces</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex flex-col gap-3">
-                <Label htmlFor="status">Status</Label>
-                <Select defaultValue={item.status}>
-                  <SelectTrigger id="status" className="w-full">
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Available">Available</SelectItem>
-                    <SelectItem value="Booked">Booked</SelectItem>
-                    <SelectItem value="Maintenance">Maintenance</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="totalQuantity">Quantity *</Label>
+                <Input
+                  id="totalQuantity"
+                  name="totalQuantity"
+                  type="number"
+                  min="1"
+                  defaultValue={item.totalQuantity}
+                  required
+                />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="target">Daily Rate</Label>
-                <Input id="target" defaultValue={item.target} />
-              </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="limit">Weekend Rate</Label>
-                <Input id="limit" defaultValue={item.limit} />
-              </div>
-            </div>
+
             <div className="flex flex-col gap-3">
-              <Label htmlFor="reviewer">Owner</Label>
-              <Select defaultValue={item.reviewer}>
-                <SelectTrigger id="reviewer" className="w-full">
-                  <SelectValue placeholder="Select an owner" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Sarah Johnson">Sarah Johnson</SelectItem>
-                  <SelectItem value="Michael Chen">Michael Chen</SelectItem>
-                  <SelectItem value="Emily Davis">Emily Davis</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="costPerDay">Daily Rate ($) *</Label>
+              <Input
+                id="costPerDay"
+                name="costPerDay"
+                type="text"
+                defaultValue={(item.costPerDay / 100).toFixed(2)}
+                placeholder="50.00"
+                required
+              />
+              <p className="text-muted-foreground text-xs">
+                Enter the daily rental rate in dollars
+              </p>
             </div>
           </form>
         </div>
         <DrawerFooter>
-          <Button>Submit</Button>
+          <Button
+            type="submit"
+            form="edit-service-form"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Saving..." : "Save Changes"}
+          </Button>
           <DrawerClose asChild>
-            <Button variant="outline">Done</Button>
+            <Button variant="outline">Cancel</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
