@@ -167,11 +167,6 @@ export default function BusinessDetailPage({
               Send Message
             </Button>
           </div>
-
-          {/* Map */}
-          <Skeleton className="flex size-full h-64 items-center justify-center bg-neutral-300 text-neutral-400 dark:bg-neutral-700 dark:text-neutral-500">
-            Map View
-          </Skeleton>
         </aside>
 
         {/* Right Content - Rental Services */}
