@@ -85,8 +85,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               Create Account
             </Button>
             <FieldDescription className="px-6 text-center">
-              Already have an account?
-              <Link href="/signin">Sign in</Link>
+              Already have an account? <Link href="/signin">Sign in</Link>
             </FieldDescription>
           </Field>
         </FieldGroup>
@@ -144,9 +143,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         />
         <FieldGroup>
           <Field>
-            <Button type="submit">Create Account</Button>
+            <Button type="submit" variant="primary">
+              Create Account
+            </Button>
             <FieldDescription className="px-6 text-center">
-              Already have an account? <a href="/signin">Sign in</a>
+              Already have an account? <Link href="/signin">Sign in</Link>
             </FieldDescription>
           </Field>
         </FieldGroup>
