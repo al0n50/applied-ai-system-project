@@ -127,6 +127,11 @@ export type RentalStatus = "pending" | "active" | "completed" | "cancelled";
 export const rentals = createTable(
   "rental",
   (d) => ({
+    id: d
+      .varchar({ length: 255 })
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     customerId: d
       .varchar({ length: 255 })
       .notNull()
@@ -155,7 +160,8 @@ export const rentals = createTable(
       .notNull(),
   }),
   (t) => [
-    primaryKey({ columns: [t.customerId, t.serviceId] }), // Composite primary key
+    index("rnt_cust_idx").on(t.customerId),
+    index("rnt_svc_idx").on(t.serviceId),
     index("rnt_dt_idx").on(t.startDate, t.endDate),
     index("rnt_st_idx").on(t.status),
   ],
