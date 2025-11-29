@@ -17,7 +17,7 @@ export default async function Navbar() {
   return (
     <nav className="flex gap-4 bg-white px-6 py-2 shadow-md dark:bg-neutral-950">
       <Button asChild variant="link">
-        <Link href="/">Rentiability</Link>
+        <Link href="/">Rentability</Link>
       </Button>
       <Button asChild variant="link">
         <Link href="/my-rentals">My Rentals</Link>
