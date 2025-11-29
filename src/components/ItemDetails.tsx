@@ -145,7 +145,7 @@ export default function ItemDetails({
   };
   return (
     <main className="mx-auto max-w-7xl p-12">
-      <section className="gap-16 lg:flex">
+      <section className="justify-center gap-16 lg:flex">
         <div className="space-y-4 pb-4">
           <Skeleton className="h-[28rem] w-[28rem] rounded-lg bg-neutral-200" />
           <div className="flex gap-4">

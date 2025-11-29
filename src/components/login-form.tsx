@@ -75,7 +75,9 @@ export function LoginForm({
                 }
               />
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" variant="primary">
+                  Login
+                </Button>
                 <Button variant="outline" type="button" disabled>
                   Login with Google
                 </Button>

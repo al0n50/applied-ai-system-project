@@ -1,22 +1,13 @@
 "use client";
 
 import React from "react";
-import { Search, Grid2X2, Table } from "lucide-react";
+import { Search } from "lucide-react";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group";
 import { Skeleton } from "./ui/skeleton";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Field, FieldGroup, FieldLabel } from "./ui/field";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
-import ToggleButtonGroup from "./ToggleButtonGroup";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -54,7 +45,6 @@ export default function RentalSearchPage({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [searchTerm, setSearchTerm] = useState(
     searchParams.get("search") ?? "",
   );
@@ -189,7 +179,7 @@ export default function RentalSearchPage({
             </Field>
           </FieldGroup>
 
-          <Button type="submit" className="bg-blue-500/90">
+          <Button type="submit" variant="primary">
             Apply Filters
           </Button>
         </form>
@@ -216,33 +206,9 @@ export default function RentalSearchPage({
         />
 
         {/* Search Results */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Select>
-              <SelectTrigger className="">
-                <SelectValue placeholder="Sort by Price" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="asc">Ascending</SelectItem>
-                  <SelectItem value="desc">Descending</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <span className="text-sm text-neutral-500">
-              Showing {services.length} of {totalItems} results
-            </span>
-          </div>
-
-          <ToggleButtonGroup
-            options={[
-              { value: "grid", icon: Grid2X2 },
-              { value: "table", icon: Table },
-            ]}
-            value={viewMode}
-            onChange={setViewMode}
-          />
-        </div>
+        <span className="text-sm text-neutral-500">
+          Showing {services.length} of {totalItems} results
+        </span>
 
         <div className="grid grid-cols-4 gap-8">
           {services.map((service) => (

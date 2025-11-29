@@ -81,7 +81,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         />
         <FieldGroup>
           <Field>
-            <Button type="submit">Create Account</Button>
+            <Button type="submit" variant="primary">
+              Create Account
+            </Button>
             <FieldDescription className="px-6 text-center">
               Already have an account?
               <Link href="/signin">Sign in</Link>
@@ -164,14 +166,14 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         <ButtonGroup className="mx-auto mb-5 w-max">
           <Button
             onClick={() => setTab("customer")}
-            variant={tab === "customer" ? "default" : "ghost"}
+            variant={tab === "customer" ? "primary" : "ghost"}
           >
             Customer
           </Button>
 
           <Button
             onClick={() => setTab("business")}
-            variant={tab === "business" ? "default" : "ghost"}
+            variant={tab === "business" ? "primary" : "ghost"}
           >
             Business
           </Button>
