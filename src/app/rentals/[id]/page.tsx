@@ -34,9 +34,14 @@ export default async function RentalDetailPage({ params }: Props) {
   });
 
   // Fetch active/pending rentals for this service to block those dates
-  const activeRentals = await db.query.rentals.findMany({
+  // Exclude cancelled rentals as they don't block availability
+  const allRentals = await db.query.rentals.findMany({
     where: eq(rentals.serviceId, id),
   });
+
+  const activeRentals = allRentals.filter(
+    (rental) => rental.status !== "cancelled",
+  );
 
   return (
     <ItemDetails

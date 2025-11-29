@@ -6,6 +6,7 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { rentals, services } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
+import type { InferSelectModel } from "drizzle-orm";
 
 const createRentalSchema = z.object({
   serviceId: z.string().min(1, "Service ID is required"),
@@ -92,4 +93,146 @@ export const createRental = async (prevState: unknown, formData: FormData) => {
   }
 
   redirect("/my-rentals");
+};
+
+export type CustomerRental = InferSelectModel<typeof rentals> & {
+  service: InferSelectModel<typeof services> & {
+    business: {
+      userId: string;
+      name: string;
+      address: string | null;
+      logo: string | null;
+      backgroundImage: string | null;
+      phoneNumber: string | null;
+      email: string | null;
+      website: string | null;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+  };
+};
+
+export const getCustomerRentals = async (
+  customerId: string,
+): Promise<CustomerRental[]> => {
+  try {
+    const customerRentals = await db.query.rentals.findMany({
+      where: eq(rentals.customerId, customerId),
+      with: {
+        service: {
+          with: {
+            business: true,
+          },
+        },
+      },
+      orderBy: (rentals, { desc }) => [desc(rentals.createdAt)],
+    });
+
+    return customerRentals;
+  } catch (error) {
+    console.error("Error fetching customer rentals:", error);
+    return [];
+  }
+};
+
+export type BusinessService = InferSelectModel<typeof services> & {
+  rentals: Array<
+    InferSelectModel<typeof rentals> & {
+      customer: {
+        id: string;
+        name: string | null;
+        email: string;
+        emailVerified: Date | null;
+        image: string | null;
+        role: "customer" | "business";
+        password: string | null;
+        createdAt: Date;
+      };
+    }
+  >;
+};
+
+export const getDashboardData = async (
+  businessUserId: string,
+): Promise<BusinessService[]> => {
+  try {
+    // Get all services for this business
+    const businessServices = await db.query.services.findMany({
+      where: eq(services.businessId, businessUserId),
+      with: {
+        rentals: {
+          with: {
+            customer: true,
+          },
+          orderBy: (rentals, { desc }) => [desc(rentals.createdAt)],
+        },
+      },
+      orderBy: (services, { desc }) => [desc(services.createdAt)],
+    });
+
+    return businessServices;
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    return [];
+  }
+};
+
+export const cancelRental = async (rentalId: string) => {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return {
+      success: false,
+      message: "You must be signed in to cancel a rental",
+    };
+  }
+
+  try {
+    // First, verify the rental belongs to the current user
+    const rental = await db.query.rentals.findFirst({
+      where: eq(rentals.id, rentalId),
+    });
+
+    if (!rental) {
+      return { success: false, message: "Rental not found" };
+    }
+
+    if (rental.customerId !== session.user.id) {
+      return {
+        success: false,
+        message: "Unauthorized: This rental does not belong to you",
+      };
+    }
+
+    // Check if rental has already started (active)
+    const now = new Date();
+    if (now >= rental.startDate && now <= rental.endDate) {
+      return { success: false, message: "Cannot cancel an active rental" };
+    }
+
+    // Check if rental is already completed or cancelled
+    if (rental.status === "completed" || rental.status === "cancelled") {
+      return {
+        success: false,
+        message: "This rental is already " + rental.status,
+      };
+    }
+
+    // Update rental status to cancelled
+    await db
+      .update(rentals)
+      .set({
+        status: "cancelled",
+        updatedAt: new Date(),
+      })
+      .where(eq(rentals.id, rentalId));
+
+    return { success: true, message: "Rental cancelled successfully" };
+  } catch (error) {
+    console.error("Error cancelling rental:", error);
+    return {
+      success: false,
+      message: "Failed to cancel rental. Please try again.",
+    };
+  }
 };
