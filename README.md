@@ -27,7 +27,8 @@ Quick tip:
 2. run `./start-database.sh` to run a docker container for PostgresSQL
 3. run `pnpm db:push` to apply the current schema to the database.
 4. create a `.env` file using `.env.example` as a template and fill in needed values (currently just AUTH_SECRET)
-5. run `pnpm dev` to run locally
+5. run `pnpm db:reset && pnpm db:push && pnpm db:seed` to reset & seed the database (run only `pnpm db:push && pnpm db:seed` starting from empty db)
+6. run `pnpm dev` to run locally
 
 ### Common Troubleshooting
 
