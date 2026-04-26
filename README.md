@@ -1,8 +1,46 @@
-# Rentability
+# Rentability: Party Equipment Scheduling & AI Assistant
 
-**A scheduling app for businesses to keep track and manage their rental services**
+## ℹ️ Original Project Context
+**Base Project:** Rentability (Modules 1-3)
+**Original Goal:** A T3 Stack scheduling app for businesses to keep track of and manage their party equipment rental services.
 
-## Local Development Setup
+## 🤖 Project 4 Extension: AI Equipment Assistant
+**Rentability AI Agent** is a backend Python microservice added to this project. It acts as an intelligent assistant for event planners and equipment rental managers. It uses a **Retrieval-Augmented Generation (RAG)** system to fetch specific equipment handling rules (like popcorn machine cleaning or chair delivery fees) from a mock database before answering client questions.
+
+### 🏗️ Architecture Overview
+*(See `assets/system_architecture.png` for the visual data flow)*
+1. **Input:** Client submits a plain-text query.
+2. **Retrieval (RAG):** The system scans the `RENTAL_KNOWLEDGE_BASE` for relevant policy data.
+3. **Generation:** The AI generates a response strictly grounded in the retrieved context.
+4. **Evaluation:** A Confidence Scorer evaluates the output. If the score is too low, the system triggers a safe fallback response to prevent hallucinating fake rental policies, and logs the failure.
+
+### ⚙️ How to Run the AI Agent (Project 4)
+1. Open your terminal in the project root directory.
+2. Run the script: `python ai_agent.py` (or `python3 ai_agent.py`).
+3. Check the `rentability_ai_logs.log` file generated to view system activity guardrails.
+
+### 💬 Sample Interactions
+* **Input:** "How do I clean the popcorn machine before I return it?"
+* **Output:** "Based on Rentability equipment guidelines: Commercial popcorn machines must be wiped down with a damp cloth after use. Do NOT submerge the kettle in water..."
+* **Reliability Score:** 0.95
+
+* **Input:** "Can I rent a bounce house for next Tuesday?"
+* **Output:** "I cannot find a specific policy regarding that equipment or service. Please contact the rental manager directly."
+* **Reliability Score:** 0.85
+
+### 🧠 Design Decisions & Testing Summary
+* **Design:** I built this as a standalone Python microservice rather than directly integrating it into the Rentability Next.js frontend. This modular approach separates the heavy AI processing logic from the UI. I implemented a confidence scoring function to give the system nuanced guardrails.
+* **Testing:** Automated testing revealed that while the system successfully blocks hallucinations, its retrieval engine can be overly rigid. For example, it easily caught the "bounce house" out-of-scope request, but it highlights the need for semantic search rather than strict keyword matching in the future.
+
+### 💡 Reflection
+This project taught me that building an AI system is less about the model itself and more about the data pipeline surrounding it. Implementing the guardrails showed me how quickly an LLM can fail if it isn't strictly tethered to a reliable knowledge base, especially in a business context where hallucinating a refund policy could cost money.
+
+https://www.loom.com/share/bf8f90ef05994bb2950523a6f0eac1d6
+
+
+---
+
+## 💻 Original Project: Local Development Setup (T3 Stack)
 
 ### Requirements
 
@@ -39,7 +77,7 @@ Quick tip:
 
 - Recommended VS Code extensions: ESLint, Prettier, Tailwind CSS IntelliSense, PostgreSQL
 
-## Create T3 App ---------------------------------------------------------------------------------------------
+## Create T3 App 
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 

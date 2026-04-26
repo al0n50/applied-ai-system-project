@@ -1,0 +1,22 @@
+2026-04-24 09:42:38,017 - INFO - Retrieving context for query: 'I want to get a golden retriever, what is the policy?'
+2026-04-24 09:42:38,017 - WARNING - No context found in database for the given query.
+2026-04-24 09:42:38,018 - INFO - System Confidence Score: 0.85
+2026-04-24 09:42:38,019 - INFO - Retrieving context for query: 'My apartment is flooding right now!'
+2026-04-24 09:42:38,019 - INFO - System Confidence Score: 0.95
+2026-04-24 09:42:38,021 - INFO - Retrieving context for query: 'Can I paint my bedroom walls blue?'
+2026-04-24 09:42:38,021 - WARNING - No context found in database for the given query.
+2026-04-24 09:42:38,021 - INFO - System Confidence Score: 0.85
+2026-04-24 10:47:03,260 - INFO - Retrieving context for query: 'How do I clean the popcorn machine before I return it?'
+2026-04-24 10:47:03,263 - INFO - System Confidence Score: 0.95
+2026-04-24 10:47:03,264 - INFO - Retrieving context for query: 'Do you deliver the plastic folding chairs?'
+2026-04-24 10:47:03,264 - INFO - System Confidence Score: 0.95
+2026-04-24 10:47:03,266 - INFO - Retrieving context for query: 'Can I rent a bounce house for next Tuesday?'
+2026-04-24 10:47:03,266 - WARNING - No context found in database for the given query.
+2026-04-24 10:47:03,266 - INFO - System Confidence Score: 0.85
+2026-04-26 00:17:36,674 - INFO - Retrieving context for query: 'How do I clean the popcorn machine before I return it?'
+2026-04-26 00:17:36,676 - INFO - System Confidence Score: 0.95
+2026-04-26 00:17:36,677 - INFO - Retrieving context for query: 'Do you deliver the plastic folding chairs?'
+2026-04-26 00:17:36,677 - INFO - System Confidence Score: 0.95
+2026-04-26 00:17:36,679 - INFO - Retrieving context for query: 'Can I rent a bounce house for next Tuesday?'
+2026-04-26 00:17:36,679 - WARNING - No context found in database for the given query.
+2026-04-26 00:17:36,679 - INFO - System Confidence Score: 0.85
